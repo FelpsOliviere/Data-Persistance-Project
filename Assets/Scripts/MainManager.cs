@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class MainManager : MonoBehaviour
 {
@@ -11,21 +13,25 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
-    public GameObject GameOverText;
-    
+    public Text BestScoreText;
+    public string newBestPlayer;
+    public GameObject gameOverContainer;
+
     private bool m_Started = false;
-    private int m_Points;
-    
+    public int m_Points;
+
     private bool m_GameOver = false;
 
-    
+
     // Start is called before the first frame update
     void Start()
     {
+        BestScoreText.text = "The best score is " + DataPersistance.Instance.bestScore + " from " + DataPersistance.Instance.bestPlayer + "!";
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
-        
-        int[] pointCountArray = new [] {1,1,2,2,5,5};
+
+        int[] pointCountArray = new[] { 1, 1, 2, 2, 5, 5 };
         for (int i = 0; i < LineCount; ++i)
         {
             for (int x = 0; x < perLine; ++x)
@@ -70,7 +76,15 @@ public class MainManager : MonoBehaviour
 
     public void GameOver()
     {
+        if (m_Points > DataPersistance.Instance.bestScore)
+        {
+            DataPersistance.Instance.bestScore = m_Points;
+            DataPersistance.Instance.bestPlayer = DataPersistance.Instance.newPlayer;
+        }
+
+        BestScoreText.text = "The best score is " + DataPersistance.Instance.bestScore + " from " + DataPersistance.Instance.bestPlayer + "!";
+        DataPersistance.Instance.SaveInformations();
         m_GameOver = true;
-        GameOverText.SetActive(true);
+        gameOverContainer.SetActive(true);
     }
 }
